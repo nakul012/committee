@@ -1,19 +1,16 @@
-
 from django.db import models
 from auth_app.models import AbstractTime
 
 
 
 class EmployeeInfo(AbstractTime):
-    name = models.CharField(
+    employee_name = models.CharField(
         "Name", max_length=100
     )
     emp_code = models.CharField(
         "Employee ID", max_length=100, unique=True
     )
-    # department = models.ManyToManyField(
-    #     MasterConfig, related_name="basicempinfo_department"
-    # )
+
     department = models.CharField(
         "Department", max_length=100
     )
@@ -34,40 +31,42 @@ class EmployeeInfo(AbstractTime):
 
 
     def __str__(self):
-        return self.user_id.email
+        return self.employee_name
     
 
 class CommitteeInfo(AbstractTime):    
-    emp_id = models.OneToOneField(
-        EmployeeInfo,
-        on_delete=models.CASCADE,
-        related_name="basicempinfo_primempinfo",
+    committee_name = models.CharField(
+        "Name", max_length=100
     )
     description = models.CharField(
         "Descrption", max_length=500, null=True, blank=True, unique=True
     )
+    level_type = models.CharField(
+        "Level Type", max_length=500, null=True, blank=True, unique=True
+    )
 
     def __str__(self):
-        return self.emp_id.user_id.email
+        return self.committee_name
 
 class RoleCommitteeInfo(AbstractTime):
     employee = models.ManyToManyField(
-        EmployeeInfo, related_name="basicempinfo_department"
+        EmployeeInfo, related_name="rolecommitteeinfo_employeeinfo", blank=True, null=True
     )
     committee = models.ForeignKey(
         CommitteeInfo,
         on_delete=models.CASCADE,
-        related_name="committeeinfo_uploadfile_medical_certificate",
+        related_name="rolecommitteeinfo_committeeinfo",
         blank=True, null=True
     )
-    name = models.CharField(
+    committee_role_name = models.CharField(
         "Name", max_length=100
     )
     role_per_employee = models.IntegerField(blank=True, null=True)
+
     description = models.CharField(
-        "Descrption", max_length=500, null=True, blank=True, unique=True
+        "Descrption", max_length=500, null=True, blank=True
     )
 
     def __str__(self):
-        return self.emp_id.user_id.email
+        return self.role_name
 

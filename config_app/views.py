@@ -97,10 +97,12 @@ class CreateCategoryOrSubcategoryView(
   
     def get(self, request, *args, **kwargs):
         try:
-            label = request.query_params.get("label")
-            if not label:
-                raise ClientErrors("query parameter 'label' is required")
-            master_configs = MasterConfig.objects.filter(label=label)  # Fetch top-level configurations
+            id = request.query_params.get("id")
+            if not id:
+                total_qs = MasterConfig.objects.all()
+                serializer = MasterConfigSerializer(total_qs, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            master_configs = MasterConfig.objects.filter(id=id)  # Fetch top-level configurations
             serializer = MasterConfigSerializer(master_configs, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         

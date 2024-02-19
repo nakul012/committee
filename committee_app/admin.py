@@ -1,3 +1,8 @@
 from django.contrib import admin
+from .models import (
+    EmployeeInfo, CommitteeInfo, RoleCommitteeInfo
+)
 
-# Register your models here.
+admin.site.register(EmployeeInfo)
+admin.site.register(CommitteeInfo)
+admin.site.register(RoleCommitteeInfo)

@@ -24,6 +24,7 @@ urlpatterns = [
     # path('master/', include('mferp.mastertableconfig.urls')),
     path('api/auth/', include('auth_app.urls')),
     path('api/config/', include('config_app.urls')),
+    # path('api/committee/', include('committee_app.urls')),
     # path('hr/', include('hr.hrconfig.urls')),
     # path('dropsdown/', include('mferp.dropsdown.urls')),
     # path('address/', include('mferp.address.urls')),
