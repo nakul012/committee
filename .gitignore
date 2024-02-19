@@ -1,0 +1,19 @@
+#Media file
+media/
+
+#Docker file
+docker-compose.yml
+
+# Environment File
+.env
+
+# Migrations File
+*migrations/
+
+# Compiled Python bytecode
+*.py[cod]
+
+
+# ssh key files
+exit
+exit.pub
