@@ -35,26 +35,34 @@ class EmployeeInfo(AbstractTime):
         on_delete=models.CASCADE,
         related_name="employeeinfo_masterconfig_designation",
     )
+    committee_count_limit = models.ForeignKey(
+        MasterConfig,
+        on_delete=models.PROTECT,
+        related_name="employeeinfo_masterconfig_committee_count",
+    )
+    committee_count_current = models.IntegerField(default=0)
 
     def __str__(self):
         return self.employee_name
     
 
 class CommitteeInfo(AbstractTime):    
-    committee_name = models.CharField(
-        "Name", max_length=100
+    committee = models.ForeignKey(
+        MasterConfig,
+        on_delete=models.CASCADE,
+        related_name="committeeinfo_masterconfig_committee",
     )
     description = models.CharField(
-        "Descrption", max_length=500, null=True, blank=True, unique=True
+        "Descrption", max_length=500, null=True, blank=True
     )
     level_type = models.ForeignKey(
         MasterConfig,
-        on_delete=models.CASCADE,
-        related_name="committeeinfo_masterconfig",
+        on_delete=models.PROTECT,
+        related_name="committeeinfo_masterconfig_level_type",
     )
 
     def __str__(self):
-        return self.committee_name
+        return self.committee.label
 
 class RoleCommitteeInfo(AbstractTime):
     employee = models.ManyToManyField(
@@ -73,10 +81,6 @@ class RoleCommitteeInfo(AbstractTime):
     )
     role_per_employee = models.IntegerField(blank=True, null=True)
 
-    description = models.CharField(
-        "Descrption", max_length=500, null=True, blank=True
-    )
-
     def __str__(self):
-        return self.role_name
+        return self.committee_role.label
 

@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'committee_module_ops.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'committee_db_1',
+        'NAME': 'committee_db_2',
         'USER': 'harry',
         'PASSWORD':'MyStrongPassword1234$',
         'HOST':'localhost',

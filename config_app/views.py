@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import MasterConfig
 from .serializers import (
-    MasterConfigSerializer,
+    MasterConfigSerializer,ConfigSerializer
 )
 from rest_framework import generics, mixins
 from auth_app.common.errors import ClientErrors, DatabaseErrors, UserErrors
@@ -99,12 +99,25 @@ class CreateCategoryOrSubcategoryView(
         try:
             id = request.query_params.get("id")
             if not id:
-                total_qs = MasterConfig.objects.all()
-                serializer = MasterConfigSerializer(total_qs, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            master_configs = MasterConfig.objects.filter(id=id)  # Fetch top-level configurations
+                total_qs = MasterConfig.objects.filter(parent__isnull=True)
+                serializer = ConfigSerializer(total_qs, many=True)
+                return Response(
+            {
+                "data": serializer.data,
+                "success": True,
+            },
+            status=status.HTTP_200_OK,
+        )
+            master_configs = MasterConfig.objects.filter(id=id, )  # Fetch top-level configurations
             serializer = MasterConfigSerializer(master_configs, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(
+            {
+                "data": serializer.data,
+                "success": True,
+            },
+            status=status.HTTP_200_OK,
+        )
+
         
         except UserErrors as error:
             return Response(
