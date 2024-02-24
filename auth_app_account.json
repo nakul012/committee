@@ -1,0 +1,1 @@
+[{"id": 1, "password": "pbkdf2_sha256$600000$CrM2i5FldTEzdGjCPxRkVV$xPkNXRaMWGelC4Aih4hZovRZLUEW6qUcRfjTyns/8YU=", "last_login": "2024-02-20 09:10:28.793056", "created_at": "2024-02-20 08:56:46.194643", "updated_at": "2024-02-20 08:56:46.206787", "email": "admin@gmail.com", "user_type": "S", "is_active": 1, "is_admin": 1}]

@@ -9,7 +9,7 @@ class EmployeeInfo(AbstractTime):
         "Name", max_length=100
     )
     emp_code = models.CharField(
-        "Employee ID", max_length=100, unique=True
+        "Employee ID", max_length=100, unique=True, null=True, blank=True
     )
 
     department = models.ForeignKey(
@@ -38,7 +38,7 @@ class EmployeeInfo(AbstractTime):
     committee_count_limit = models.ForeignKey(
         MasterConfig,
         on_delete=models.PROTECT,
-        related_name="employeeinfo_masterconfig_committee_count",
+        related_name="employeeinfo_masterconfig_committee_count", null=True, blank=True
     )
     committee_count_current = models.IntegerField(default=0)
 
@@ -47,7 +47,7 @@ class EmployeeInfo(AbstractTime):
     
 
 class CommitteeInfo(AbstractTime):    
-    committee = models.ForeignKey(
+    committee = models.OneToOneField(
         MasterConfig,
         on_delete=models.CASCADE,
         related_name="committeeinfo_masterconfig_committee",
@@ -63,7 +63,21 @@ class CommitteeInfo(AbstractTime):
 
     def __str__(self):
         return self.committee.label
+    
 
+    def delete(self, *args, **kwargs):
+        # Decrease the committee_count_current field in EmployeeInfo
+        employee_infos = RoleCommitteeInfo.objects.filter(committee=self)
+        for employee_info in employee_infos:
+            employee_qs = employee_info.employee.all()
+            for employee in employee_qs:
+                if employee:
+                    employee.committee_count_current -= 1
+                    employee.save()
+
+        super().delete(*args, **kwargs)
+
+# can one committee have one employee on two different roles
 class RoleCommitteeInfo(AbstractTime):
     employee = models.ManyToManyField(
         EmployeeInfo, related_name="rolecommitteeinfo_employeeinfo", blank=True, null=True
@@ -74,7 +88,7 @@ class RoleCommitteeInfo(AbstractTime):
         related_name="rolecommitteeinfo_committeeinfo",
         blank=True, null=True
     )
-    committee_role = models.ForeignKey(
+    committee_role = models.OneToOneField(
         MasterConfig,
         on_delete=models.CASCADE,
         related_name="rolecommitteeinfo_masterconfig",

@@ -13,6 +13,7 @@ class AssignCommitteeSerializer(serializers.Serializer):
     level_type = serializers.CharField()
     description = serializers.CharField( allow_null=True, allow_blank=True)
     type_of_committee = serializers.CharField()
+    # child_count = serializers.CharField()
     roles = RoleSerializer(many=True)
 
 

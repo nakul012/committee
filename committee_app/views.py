@@ -19,43 +19,87 @@ class AssignCommitteeView(
     generics.GenericAPIView, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin
 ):
     serializer_class = AssignCommitteeSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
 
  
     def post(self, request):
         try:
-
             data = request.data
             committee_info_created = False
-            serializer = AssignCommitteeSerializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            if not serializer.is_valid(raise_exception=False):
-                err = " ".join(
-                    [
-                        f"{field}: {', '.join(error)}"
-                        for field, error in serializer.errors.items()
-                    ]
-                )
-                raise ClientErrors(err)
-            validated_data = serializer.validated_data
-            level_type = int(validated_data["level_type"])
-            type_of_committee = int(validated_data["type_of_committee"])
-            description = validated_data["description"]
-            roles = validated_data["roles"]
+            # serializer = AssignCommitteeSerializer(data=data)
+            # serializer.is_valid(raise_exception=True)
+            # if not serializer.is_valid(raise_exception=False):
+            #     err = " ".join(
+            #         [
+            #             f"{field}: {', '.join(error)}"
+            #             for field, error in serializer.errors.items()
+            #         ]
+            #     )
+            #     raise ClientErrors(err)
+            # validated_data = serializer.validated_data
+            # level_type = int(validated_data["level_type"])
+            # type_of_committee = int(validated_data["type_of_committee"])
+            # description = validated_data["description"]
+            # roles = validated_data["roles"]
+
+        #     seen3 = []
+
+        #     for role in roles:
+        #         seen = {}     
+        #         seen2 = {}
+        #         seen["role"] = int(role["role"])
+        #         seen["count"] = int(role["count"])
+        #         seen["department"] = []
+        #         for department_id in role["department"]:
+        #             seen2["department"] = department_id
+        #             seen2["employees"] = EmployeeInfo.objects.filter(category_of_employee__id__in=role["category_of_employee"],
+        # designation__id__in=role["designation"], department_id = department_id)
+        #             seen["department"].append(seen2)
+        #             seen2 = {}
+        #         seen3.append(seen)
+        #     total_selected_employee = []
+        #     employee_object_data = []
+            
+            if ("child_count" or "level_type" or "type_of_committee") not in request.data:
+                raise ClientErrors(message="All fields are required", response_code=400)
+            type_of_committee = int(request.data.get("type_of_committee"))
+            level_type = int(request.data.get("level_type"))
+            description = request.data.get("description")
+            child_count = int(request.data.get("child_count"))
+            for assign in range(0, child_count):
+                if ("role_" + str(assign)) not in request.data:
+                    raise ClientErrors("All field required")
+                if ("count_" + str(assign)) not in request.data:
+                    raise ClientErrors("All field required")
+                if ("department_" + str(assign)) not in request.data:
+                    raise ClientErrors("All field required")
+                if ("category_of_employee_" + str(assign)) not in request.data:
+                    raise ClientErrors("All field required")
+                if ("designation_" + str(assign)) not in request.data:
+                    raise ClientErrors("All field required")
+                
             seen3 = []
+            for assign in range(0, child_count):
+                role = data.get("role_" + str(assign))
+                count = data.get("count_" + str(assign))
+                department = data.get("department_" + str(assign))
+                category_of_employee = data.get("category_of_employee_" + str(assign))
+                designation = data.get("designation_" + str(assign))
+
+            
 
             # create department wise employee
-            for role in roles:
+            # for role in roles:
                 seen = {}     
                 seen2 = {}
-                seen["role"] = int(role["role"])
-                seen["count"] = int(role["count"])
+                seen["role"] = int(role)
+                seen["count"] = int(count)
                 seen["department"] = []
-                for department_id in role["department"]:
+                for department_id in department:
                     seen2["department"] = department_id
-                    seen2["employees"] = EmployeeInfo.objects.filter(category_of_employee__id__in=role["category_of_employee"],
-        designation__id__in=role["designation"], department_id = department_id)
+                    seen2["employees"] = EmployeeInfo.objects.filter(category_of_employee__id__in=category_of_employee,
+        designation__id__in=designation, department_id = department_id)
                     seen["department"].append(seen2)
                     seen2 = {}
                 seen3.append(seen)
@@ -91,6 +135,11 @@ class AssignCommitteeView(
                                     if random_object.committee_count_current >= int(random_object.committee_count_limit.label) or random_object in employee_object_data:
                                         employee_qs = employee_qs.exclude(pk=random_object.pk)
                                     else:
+                                        lst_of_employee.append(random_object)
+                                        employee_object_data.append(random_object)
+                                        employee_qs = employee_qs.exclude(pk=random_object.pk)
+                                        department["employees"] = employee_qs
+                                        count-=1
                                         break
                             else:
 
@@ -106,11 +155,11 @@ class AssignCommitteeView(
                 selected_employee["employees"] = lst_of_employee
                 if count>0:
                     label = MasterConfig.objects.get(id=item['role']).label
-                    raise ClientErrors(f"Employees are not enought to be selected for this role {label} ")
+                    raise ClientErrors(f"Employees are not enought to be selected for the role {label} ")
                 total_selected_employee.append(selected_employee)
             if not committee_info_created:
                 label = MasterConfig.objects.get(id=type_of_committee)
-                level_type = MasterConfig.objects.get(id=int(validated_data["level_type"])) 
+                level_type = MasterConfig.objects.get(id=level_type) 
                 committee_exist = CommitteeInfo.objects.filter(committee=label, level_type=level_type).first()
                 if committee_exist:
                     raise ClientErrors("This committee is already exist.")

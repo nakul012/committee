@@ -20,4 +20,4 @@ class MasterConfig(AbstractTime):
     )
 
     def __str__(self):
-        return self.label
+        return self.label + f"__{self.id}"

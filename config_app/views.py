@@ -16,7 +16,7 @@ class CreateCategoryOrSubcategoryView(
     generics.GenericAPIView, mixins.ListModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin
 ):
     serializer_class = MasterConfigSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = MasterConfig.objects.all()
 
  
@@ -97,10 +97,13 @@ class CreateCategoryOrSubcategoryView(
   
     def get(self, request, *args, **kwargs):
         try:
+            # import ipdb;
+            # ipdb.set_trace()
             id = request.query_params.get("id")
-            if not id:
+            label = request.query_params.get("label")
+            if not id and not label:
                 total_qs = MasterConfig.objects.filter(parent__isnull=True)
-                serializer = ConfigSerializer(total_qs, many=True)
+                serializer = MasterConfigSerializer(total_qs, many=True)
                 return Response(
             {
                 "data": serializer.data,
@@ -108,15 +111,26 @@ class CreateCategoryOrSubcategoryView(
             },
             status=status.HTTP_200_OK,
         )
-            master_configs = MasterConfig.objects.filter(id=id, )  # Fetch top-level configurations
-            serializer = MasterConfigSerializer(master_configs, many=True)
-            return Response(
-            {
-                "data": serializer.data,
-                "success": True,
-            },
-            status=status.HTTP_200_OK,
-        )
+            if id:
+                master_configs = MasterConfig.objects.filter(id=id, )  # Fetch top-level configurations
+                serializer = MasterConfigSerializer(master_configs, many=True)
+                return Response(
+                {
+                    "data": serializer.data,
+                    "success": True,
+                },
+                status=status.HTTP_200_OK,
+            )
+            else:
+                master_configs = MasterConfig.objects.filter(label = label )  # Fetch top-level configurations
+                serializer = MasterConfigSerializer(master_configs, many=True)
+                return Response(
+                {
+                    "data": serializer.data,
+                    "success": True,
+                },
+                status=status.HTTP_200_OK,
+            )
 
         
         except UserErrors as error:

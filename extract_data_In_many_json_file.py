@@ -9,7 +9,6 @@ db_config = {
     "database": "committee_db_2",
 }
 
-# extract_all_data_In_one_json_file.py
 # Connect to the database
 try:
     conn = mysql.connector.connect(**db_config)
@@ -19,18 +18,13 @@ try:
     cursor.execute("SHOW TABLES")
     tables = [table['Tables_in_committee_db_2'] for table in cursor.fetchall()]
 
-    # Create a dictionary to store data from all tables
-    all_data = {}
-
-    # Extract data from each table and store it in the dictionary
+    # Extract data from each table and write to JSON files
     for table in tables:
         cursor.execute(f"SELECT * FROM {table}")
         data = cursor.fetchall()
-        all_data[table] = data
 
-    # Write the aggregated data to a single JSON file
-    with open("kieterp_data.json", "w") as json_file:
-        json.dump(all_data, json_file, default=str)
+        with open(f"{table}.json", "w") as json_file:
+            json.dump(data, json_file, default=str)
 
 except mysql.connector.Error as e:
     print(f"Error: {e}")
